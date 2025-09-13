@@ -1,0 +1,197 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unobtanium</title>
+</head>
+<body>
+    <header>
+        <h1>Unobtanium Ecosystem</h1>
+        <p>All transactions in Credits (1:1 to 2019 USD). Consignment Store Model for Goods & Services.</p>
+        <p>Negative Dues: 2,500 Credits/month, reduces by half of income above 2,500/month, 0 at 100,000 Credits.</p>
+        <p>Essentials cap: 20,000 Credits lifetime, then 100% coverage.</p>
+        <p>Governance: Gunther Adolfo Zielke has permanent ability to print and destroy credits until passing.</p>
+        <p>Heirs shall give this ability to the Jewish Messiah.</p>
+        <p>Freelance & Labor Ownership: Isaiah (20%), Dad (20%), Mom (20%), Lenny (20%), IPO (20%).</p>
+    </header>
+
+    <p>Logged in as: Gunther Adolfo Zielke (Admin) | Balance: 0 Credits</p>
+
+    <nav>
+        <ul>
+            <li><a href="#goods-marketplace">Goods Marketplace</a></li>
+            <li><a href="#freelance-labor">Freelance & Labor</a></li>
+            <li><a href="#consumers-alliance">Consumer’s Alliance</a></li>
+            <li><a href="#operation-lightspeed">Operation Lightspeed</a></li>
+            <li><a href="#2x2-ads">2x2 Ads</a></li>
+            <li><a href="#tiny-homes-beds">Tiny Homes Beds</a></li>
+        </ul>
+    </nav>
+
+    <section id="goods-marketplace">
+        <h2>Goods Marketplace</h2>
+        <form>
+            <label for="item-name">Item Name</label>
+            <input type="text" id="item-name" name="item-name">
+            
+            <label for="description">Description</label>
+            <textarea id="description" name="description"></textarea>
+            
+            <label for="product-category">Product Category</label>
+            <select id="product-category" name="product-category">
+                <option value="food">Food</option>
+                <option value="pokemon-cards">Pokémon Cards</option>
+                <option value="electronics">Electronics</option>
+            </select>
+
+            <label for="transaction-type">Transaction Type</label>
+            <select id="transaction-type" name="transaction-type">
+                <option value="sell">Sell</option>
+                <option value="trade">Trade</option>
+            </select>
+
+            <label for="price">Price (Credits)</label>
+            <input type="number" id="price" name="price">
+            
+            <button type="submit">List Item</button>
+        </form>
+    </section>
+
+    <section id="freelance-labor">
+        <h2>Freelance & Labor</h2>
+        <form>
+            <label for="job-title">Job Title</label>
+            <input type="text" id="job-title" name="job-title">
+            
+            <label for="job-description">Description</label>
+            <textarea id="job-description" name="job-description"></textarea>
+            
+            <label for="job-category">Category</label>
+            <select id="job-category" name="job-category">
+                <option value="web-development">Web Development</option>
+                <option value="graphic-design">Graphic Design</option>
+                <option value="construction">Construction</option>
+                <option value="plumbing">Plumbing</option>
+                <option value="electrical">Electrical</option>
+            </select>
+
+            <label for="union-job">
+                <input type="checkbox" id="union-job" name="union-job"> Union Job
+            </label>
+            
+            <label for="budget">Budget (Credits)</label>
+            <input type="number" id="budget" name="budget">
+            
+            <label for="bid-amount">Bid Amount (Optional)</label>
+            <input type="number" id="bid-amount" name="bid-amount">
+            
+            <button type="submit">Post Job</button>
+        </form>
+    </section>
+
+    <section id="consumers-alliance">
+        <h2>Consumer’s Alliance</h2>
+        <h3>Claim Negative Dues</h3>
+        <form>
+            <h4>Issue Credits</h4>
+            <label for="issue-user">Select User</label>
+            <input type="text" id="issue-user" name="issue-user">
+            
+            <label for="issue-amount">Amount to Issue</label>
+            <input type="number" id="issue-amount" name="issue-amount">
+            
+            <button type="submit">Issue Credits</button>
+        </form>
+
+        <form>
+            <h4>Destroy Credits</h4>
+            <label for="destroy-user">Select User</label>
+            <input type="text" id="destroy-user" name="destroy-user">
+            
+            <label for="destroy-amount">Amount to Destroy</label>
+            <input type="number" id="destroy-amount" name="destroy-amount">
+            
+            <button type="submit">Destroy Credits</button>
+        </form>
+
+        <form>
+            <h4>Search Accounts</h4>
+            <input type="text" id="search-accounts" name="search-accounts">
+            <button type="submit">Search</button>
+        </form>
+    </section>
+
+    <section id="operation-lightspeed">
+        <h2>Operation Lightspeed</h2>
+        <form>
+            <label for="mwh">MWh to Buy</label>
+            <input type="number" id="mwh" name="mwh">
+            
+            <button type="submit">Buy Energy</button>
+        </form>
+    </section>
+
+    <section id="2x2-ads">
+        <h2>2x2 Ads</h2>
+        <form>
+            <label for="ad-content">Ad Content</label>
+            <textarea id="ad-content" name="ad-content"></textarea>
+            
+            <label for="ad-level">Level (1-100)</label>
+            <input type="number" id="ad-level" name="ad-level" min="1" max="100">
+            
+            <button type="submit">Place Ad</button>
+        </form>
+    </section>
+
+    <section id="tiny-homes-beds">
+        <h2>Tiny Homes Beds</h2>
+        <form>
+            <label for="months-to-rent">Months to Rent</label>
+            <input type="number" id="months-to-rent" name="months-to-rent">
+            
+            <button type="submit">Rent Bed</button>
+        </form>
+    </section>
+</body>
+</html>
